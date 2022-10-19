@@ -104,38 +104,43 @@ class _HomePageState extends State<HomePage> {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _posts.length,
-                      controller: _controller,
-                      itemBuilder: (_, index) => Card(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 10),
-                        child: ListTile(
-                          title: Text(_posts[index]['title']),
-                          subtitle: Text(_posts[index]['body']),
+            : RefreshIndicator(
+                onRefresh: () async {
+                  _firstLoad();
+                },
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _posts.length,
+                        controller: _controller,
+                        itemBuilder: (_, index) => Card(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 10),
+                          child: ListTile(
+                            title: Text(_posts[index]['title']),
+                            subtitle: Text(_posts[index]['body']),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  if (_isLoadMoreRunning == true)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 10, bottom: 40),
-                      child: Center(
-                        child: CircularProgressIndicator(),
+                    if (_isLoadMoreRunning == true)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10, bottom: 40),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
                       ),
-                    ),
-                  if (_hasNextPage == false)
-                    Container(
-                      padding: const EdgeInsets.only(top: 30, bottom: 40),
-                      color: Colors.amber,
-                      child: const Center(
-                        child: Text('You have fetched all of the content'),
+                    if (_hasNextPage == false)
+                      Container(
+                        padding: const EdgeInsets.only(top: 30, bottom: 40),
+                        color: Colors.amber,
+                        child: const Center(
+                          child: Text('You have fetched all of the content'),
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ));
   }
 }
