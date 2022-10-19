@@ -24,6 +24,10 @@ class _HomePageState extends State<HomePage> {
 
   List _posts = [];
 
+  List filteredPosts = [];
+
+  var searchedValue = '';
+
   void _loadMore() async {
     if (_hasNextPage == true &&
         _isFirstLoadRunning == false &&
@@ -70,7 +74,7 @@ class _HomePageState extends State<HomePage> {
       final res =
           await http.get(Uri.parse("$_baseUrl?_page=$_page&_limit=$_limit"));
       setState(() {
-        _posts = json.decode(res.body);
+        _posts = filteredPosts = json.decode(res.body);
       });
     } catch (err) {
       if (kDebugMode) {
@@ -83,6 +87,20 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void filterPosts(String value) {
+    setState(() {
+      filteredPosts = _posts.where((element) {
+        return element['title'].toString().contains(value);
+      }).toList();
+    });
+
+    // filteredPosts =
+    //     _posts.where((element) => element['title'] == value).toList();
+    // setState(() {
+    //   _posts = filteredPosts;
+    // });
+  }
+
   late ScrollController _controller;
   @override
   void initState() {
@@ -93,6 +111,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print('filter-posts: $filteredPosts');
     return Scaffold(
         appBar: AppBar(
           title: const Text(
@@ -110,16 +129,32 @@ class _HomePageState extends State<HomePage> {
                 },
                 child: Column(
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: TextField(
+                        onChanged: (value) {
+                          searchedValue = value;
+                          filterPosts(searchedValue);
+                          print(searchedValue);
+                        },
+                        decoration: InputDecoration(
+                          suffixIcon: Icon(Icons.search),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
                     Expanded(
                       child: ListView.builder(
-                        itemCount: _posts.length,
+                        itemCount: filteredPosts.length,
                         controller: _controller,
                         itemBuilder: (_, index) => Card(
                           margin: const EdgeInsets.symmetric(
                               vertical: 8, horizontal: 10),
                           child: ListTile(
-                            title: Text(_posts[index]['title']),
-                            subtitle: Text(_posts[index]['body']),
+                            title: Text(filteredPosts[index]['title']),
+                            subtitle: Text(filteredPosts[index]['body']),
                           ),
                         ),
                       ),
