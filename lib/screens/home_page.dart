@@ -7,10 +7,10 @@ class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   final _baseUrl = 'https://jsonplaceholder.typicode.com/posts';
 
   int _page = 0;
@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _firstLoad() async {
+  Future<void> firstLoad() async {
     setState(() {
       _isFirstLoadRunning = true;
     });
@@ -105,7 +105,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _firstLoad();
+    firstLoad();
     _controller = ScrollController()..addListener(_loadMore);
   }
 
@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
               )
             : RefreshIndicator(
                 onRefresh: () async {
-                  _firstLoad();
+                  firstLoad();
                 },
                 child: Column(
                   children: [
